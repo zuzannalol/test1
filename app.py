@@ -1,4 +1,5 @@
 
+# Tu wstaw kod aplikacji
 import streamlit as st
 import random
 import time
@@ -7,8 +8,8 @@ import pandas as pd
 # Przygotowanie bodźców
 polish_words = ["dom", "pies", "kot", "las", "stół", "krzesło", "okno", "droga", "szkoła", "miasto"]
 english_words = ["house", "dog", "cat", "forest", "table", "chair", "window", "road", "school", "city"]
-polish_pseudowords = ["klopar", "szytok", "pruszel", "brutol", "flepoz", "gonter"]
-english_pseudowords = ["brimpol", "shoklin", "blonker", "frodle", "plirke", "gonkle"]
+polish_pseudowords = ["wredon", "klopar", "szytok", "pruszel", "glapok", "zwarny", "brutol", "flepoz", "gonter"]
+english_pseudowords = ["brimpol", "glaper", "shoklin", "trepzo", "blonker", "frodle", "snupik", "plirke", "gonkle"]
 
 stimuli = (
     [{"word": word, "language": "polish", "is_real": True} for word in polish_words] +
@@ -49,36 +50,38 @@ def record_response(key):
 # Ekran początkowy
 if not st.session_state.experiment_started:
     st.title("Eksperyment: Klasyfikacja słów")
-    st.write("Twoim zadaniem będzie przyporządkowanie wyświetlanych słów do jednej z dwóch kategorii:")
-    st.markdown("- **Prawdziwe słowa** (np. "dom", "cat")")
-    st.markdown("- **Pseudowyrazy** (np. "klopar", "brimpol")")
-    st.write("Użyj klawiszy, aby dokonać wyboru:")
-    st.markdown("- **Z** - Prawdziwe słowo")
-    st.markdown("- **M** - Pseudowyraz")
-    st.write("Po naciśnięciu przycisku "Start", eksperyment się rozpocznie.")  # Poprawiona linia
-
+    st.write("Twoim zadaniem będzie przyporządkowanie wyświetlanych słów do jednej z dwóch kategorii: 
+ prawdziwe wyrazy (po polsku lub angielsku) oraz pseudowyrazy (wyrazy nieistniejące, ale przypominające prawdziwe)")
+    st.write("
+Użyj przycisków, aby dokonać wyboru:")
+    st.markdown("Prawdziwe słowo")
+    st.markdown("Pseudowyraz")
+    st.write("Po naciśnięciu przycisku "Start", eksperyment się rozpocznie.")
+    
     if st.button("Start"):
         st.session_state.experiment_started = True
         st.session_state.start_time = time.time()
 
-# Ekran eksperymentu
-elif st.session_state.current_index < len(stimuli):
-    stimulus = stimuli[st.session_state.current_index]
-    st.markdown(f"<h1 style='text-align: center; font-size: 4em;'>{stimulus['word']}</h1>", unsafe_allow_html=True)
 
+# Wyświetlanie bodźców
+if st.session_state.current_index < len(stimuli):
+    stimulus = stimuli[st.session_state.current_index]
+    st.write(f"**{stimulus['word']}**")
+    st.write("Naciśnij (Prawdziwe słowo) jeśli to prawdziwe słowo lub (Pseudowyraz) jeśli to pseudowyraz.")
+    
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("Z (Prawdziwe słowo)"):
+        if st.button("(Prawdziwe słowo)"):
             record_response("z")
     with col2:
-        if st.button("M (Pseudowyraz)"):
+        if st.button("(Pseudowyraz)"):
             record_response("m")
-
+    
     if st.session_state.start_time is None:
         st.session_state.start_time = time.time()
 
-# Ekran końcowy
 else:
+    # Koniec eksperymentu
     st.write("Dziękujemy za udział w eksperymencie!")
     st.write("Wyniki:")
     df = pd.DataFrame(st.session_state.results)
